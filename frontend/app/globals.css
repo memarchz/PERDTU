@@ -16,3 +16,21 @@
 .item-card-link{display:block;color:inherit;text-decoration:none}.item-card .save-control{padding:0 18px 18px}.save-control{margin:10px 0}.photo-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:15px 0}.photo-tile{min-width:0}.photo-tile img{width:100%;height:160px;object-fit:cover;border-radius:12px}.photo-tile button{padding:6px 9px}.photo-picker{margin:24px 0}.gallery-main{aspect-ratio:1;background:var(--sage);border-radius:20px;overflow:hidden;display:grid;place-items:center}.gallery-main img{width:100%;height:100%;object-fit:contain}.gallery-thumbnails{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}.gallery-thumbnails button{width:70px;height:70px;padding:3px;border:1px solid #b5bfb1;border-radius:9px;background:white}.gallery-thumbnails button[aria-pressed=true]{border:3px solid #355947}.gallery-thumbnails img{width:100%;height:100%;object-fit:cover}.owner-actions{margin:12px 0 24px}.detail-layout>*,.item-card,.owner-row>div,.cycle-person,.timeline li>div,.nav-account>span,.items-grid>*{min-width:0}h1,h2,h3,.owner-row strong,.cycle-person,.timeline p,.nav-account strong{overflow-wrap:anywhere}.button-row{flex-wrap:wrap}.item-gallery{min-width:0}
 @media(max-width:420px){.photo-grid{grid-template-columns:minmax(0,1fr)}.photo-tile img{height:190px}}
 .exchange-fields{margin:24px 0}.exchange-checkbox{display:flex;align-items:center;flex-wrap:wrap;gap:10px}.exchange-checkbox input{width:18px;height:18px}.exchange-checkbox small{display:block;width:100%;color:#687b70}.exchange-preference{margin:14px 0;padding:12px;background:#edf1e8;border-radius:10px;overflow-wrap:anywhere}.exchange-preference strong{font-size:12px;text-transform:uppercase;letter-spacing:.04em}.exchange-preference p{margin:6px 0}.exchange-preference small{display:block;color:#526b5b}.swap-summary{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:18px 0}.swap-summary>div{min-width:0}.swap-summary h3{overflow-wrap:anywhere}.alternative-card{border-color:#bda87a}.match-controls{display:flex;gap:16px;align-items:end;flex-wrap:wrap;margin-bottom:24px}.match-controls .form-field{flex:1;min-width:180px}@media(max-width:600px){.swap-summary{grid-template-columns:1fr}}
+/* Private conversation attached to an accepted exchange. */
+.trade-chat { margin-top: 28px; }
+.trade-chat h2 { display:flex; align-items:center; gap:10px; }
+.chat-access,.chat-note,.chat-meta time { font-size:12px; color:var(--muted, #6b7b73); }
+.chat-locked { display:flex; align-items:center; gap:10px; padding:22px 0 8px; color:#6b7b73; }
+.chat-messages { max-height:420px; min-height:120px; overflow-y:auto; overscroll-behavior:contain; padding:16px 8px 16px 0; display:flex; flex-direction:column; gap:14px; }
+.chat-message { width:fit-content; max-width:85%; padding:13px 17px; border-radius:16px 16px 16px 4px; background:#f0f3eb; align-self:flex-start; }
+.chat-message.is-own { align-self:flex-end; background:#e1ece3; border-radius:16px 16px 4px 16px; }
+.chat-meta { display:flex; align-items:baseline; gap:16px; flex-wrap:wrap; font-size:13px; margin-bottom:5px; }
+.chat-message p { white-space:pre-wrap; overflow-wrap:anywhere; margin:0; line-height:1.65; }
+.chat-empty { margin:auto; padding:24px; color:#6b7b73; text-align:center; }
+.chat-note { margin:10px 0 20px; }
+.chat-composer label { display:block; margin-bottom:8px; font-size:14px; }
+.chat-composer textarea { width:100%; min-height:90px; resize:vertical; padding:14px 16px; border:1px solid #cbd8ce; border-radius:14px; background:#fffef9; font:inherit; color:inherit; }
+.chat-composer textarea:focus-visible,.chat-messages:focus-visible { outline:2px solid #0b6653; outline-offset:3px; }
+.chat-composer-actions { display:flex; align-items:center; justify-content:space-between; gap:16px; margin-top:10px; }
+.chat-composer-actions small { color:#6b7b73; }
+@media(max-width:700px) { .chat-message { max-width:95%; } .chat-access { max-width:95px; text-align:right; } .chat-meta { gap:6px; } }

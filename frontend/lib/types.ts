@@ -14,3 +14,4 @@ export const CONDITIONS = [{ value: 'LIKE_NEW', label: 'Like new' }, { value: 'G
 export type SavedEntry={id:string;itemId:string;createdAt:string;available:boolean;item:ItemSummary|{id:string;title:string;status:string}};
 
 export type MatchEnvelope={status:string;selectedItemId:string|null;model?:{id:string;revision:string};matches:Match[];candidatesConsidered:number;truncated:boolean;message?:string};
+export type ChatMessage = {id:string;sender:{id:string;displayName:string};body:string;createdAt:string;clientMessageId:string};

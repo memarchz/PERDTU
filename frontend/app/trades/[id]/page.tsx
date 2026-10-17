@@ -9,6 +9,7 @@ import { useAuth } from '../../../components/auth-provider';
 import { Button, PageHeading, PageState, StatusBadge } from '../../../components/ui';
 import { CycleView } from '../../../components/cycle-view';
 import { TradeTimeline } from '../../../components/trade-timeline';
+import { TradeChat } from '../../../components/trade-chat';
 import { useResource } from '../../../lib/use-resource';
 import { availableTradeActions } from '../../../lib/trade-actions.mjs';
 import type { Trade } from '../../../lib/types';
@@ -37,6 +38,7 @@ function TradeContent() {
       <div className="trade-actions">{trade.status === 'PROPOSED' && <p>Everyone must accept before any item is reserved.</p>}{['CONFIRMED', 'EXCHANGING'].includes(trade.status) && <p>Coordinate your exchange with the other participants. Confirm only after you have received your incoming item.</p>}{trade.status === 'COMPLETED' && <p>All participants have confirmed receipt. A second story for every item.</p>}{trade.status === 'CANCELLED' && <p className="notice">This pending proposal was cancelled because an item was updated or archived. Explore current items for a new exchange.</p>}{trade.status === 'DECLINED' && <p>This proposal was declined. You can look for another connection.</p>}
       <div className="button-row">{actions?.canAccept && <Button busy={busy === 'accept'} disabled={!!busy} onClick={() => void act('accept')}><Check size={16} /> Accept exchange</Button>}{actions?.canDecline && <Button className="danger" busy={busy === 'decline'} disabled={!!busy} onClick={() => void act('decline')}><X size={16} /> Decline</Button>}{actions?.canConfirmReceipt && <Button busy={busy === 'receipt'} disabled={!!busy} onClick={() => void act('receipt')}><PackageCheck size={17} /> Confirm receipt</Button>}{!actions?.canAccept && !actions?.canConfirmReceipt && trade.status === 'PROPOSED' && <p className="notice">Your response is saved. Waiting for the other participants.</p>}</div></div></section><aside className="panel timeline-panel"><h2>Along the way</h2><p className="muted" style={{ marginBottom: 25 }}>The moments that make this exchange.</p><TradeTimeline events={trade.events} participants={trade.participants.map(p => p.user)} /></aside></div>
     </>}
+    <TradeChat tradeId={id}/>
   </>;
 }
 export default function TradeDetail() { return <AppShell><RequireAuth><TradeContent /></RequireAuth></AppShell>; }
