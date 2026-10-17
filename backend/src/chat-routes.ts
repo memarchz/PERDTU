@@ -36,7 +36,7 @@ export function createChatRouter(db:PrismaClient,auth:RequestHandler) {
       // Serialize chat writes with receipt/status transitions on the existing trade row.
       const member=await tx.tradeParticipant.findUnique({where:{tradeId_userId:{tradeId:req.params.id,userId:req.userId!}},select:{id:true}});
       if(!member)throw new ChatError('Trade not found',404);
-      await tx.$executeRaw`UPDATE "Trade" SET "updatedAt" = CURRENT_TIMESTAMP WHERE id = ${req.params.id}`;
+      await tx.trade.update({where:{id:req.params.id},data:{updatedAt:new Date()},select:{id:true}});
       const trade=await tx.trade.findFirst({where:{id:req.params.id,participants:{some:{userId:req.userId!}}},select:{id:true,status:true}});
       if(!trade)throw new ChatError('Trade not found',404);
       const prior=await tx.tradeMessage.findUnique({where:{tradeId_senderId_clientMessageId:{tradeId:trade.id,senderId:req.userId!,clientMessageId:input.clientMessageId}},include});

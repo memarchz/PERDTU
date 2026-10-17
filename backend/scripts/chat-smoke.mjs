@@ -13,13 +13,14 @@ async function call(path,user,body,status=200){
 }
 async function fixture(n){
  const users=await Promise.all(Array.from({length:n},(_,i)=>db.user.create({data:{email:`chat-${randomUUID()}@example.test`,displayName:`Chat member ${i+1}`,passwordHash:'not-a-login-fixture'}})));
- const trade=await db.trade.create({data:{participants:{create:users.map(u=>({userId:u.id}))}}});return {users,trade,path:`/trades/${trade.id}/messages`};
+ const items=await Promise.all(users.map(u=>db.item.create({data:{ownerId:u.id,title:'Chat exchange fixture',description:'Local integration fixture',category:'Books',condition:'GOOD',exchangeCategory:'Books'}})));
+ const trade=await db.trade.create({data:{participants:{create:users.map(u=>({userId:u.id}))},items:{create:items.map((item,i)=>({itemId:item.id,fromUserId:users[i].id,toUserId:users[(i+1)%n].id,snapshot:{title:item.title}}))}}});return {users,items,trade,path:`/trades/${trade.id}/messages`};
 }
 const body=(text='Hello')=>({body:text,clientMessageId:randomUUID()});
 try {
  const outsider=await db.user.create({data:{email:`chat-outsider-${randomUUID()}@example.test`,displayName:'Outside',passwordHash:'not-a-login-fixture'}});
  for(const n of [2,3,4]){
-  const {users,trade,path}=await fixture(n);
+  const {users,items,trade,path}=await fixture(n);
   await call(path,null,undefined,401);await call(path,outsider,undefined,404);await call(path,outsider,body(),404);
   assert.equal((await call(path,users[0])).opened,false);await call(path,users[0],body(),409);
   for(let i=0;i<n;i++){
@@ -27,6 +28,7 @@ try {
    assert.equal((await call(path,users[0])).canSend,i===n-1);
   }
   for(const u of users)assert.equal((await call(path,u)).canSend,true);
+  for(const item of items)assert.equal((await db.item.findUnique({where:{id:item.id}})).status,'RESERVED');
   const text=body('  <script>plain text only</script>  '),sent=await call(path,users[0],text,201);
   assert.equal(sent.message.body,'<script>plain text only</script>');
   assert.equal((await call(path,users[0],text)).message.id,sent.message.id);
@@ -58,6 +60,9 @@ try {
   assert.ok([201,409].includes(sendResult.status));checks++;
   assert.equal(await db.tradeMessage.count({where:{tradeId:trade.id,clientMessageId:raced.clientMessageId}}),sendResult.status===201?1:0);
   const completed=await call(path,users[0]);assert.equal(completed.canSend,false);assert.ok(completed.messages.length);
+  for(let i=0;i<n;i++){
+   const inventory=await call('/me/items',users[i]);assert.equal(inventory.find(item=>item.id===items[i].id).status,'EXCHANGED');
+  }
   await call(path,users[0],body(),409);await call(path,users[0],text); // acknowledged retry remains safe
   await db.trade.update({where:{id:trade.id},data:{status:'CANCELLED'}});
   assert.ok((await call(path,users[0])).messages.length);await call(path,users[0],body(),409);
