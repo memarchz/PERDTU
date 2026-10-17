@@ -5,7 +5,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "test": "node --test tests/api.test.mjs tests/session.test.mjs tests/publish.test.mjs tests/trade-actions.test.mjs tests/auth.test.mjs tests/photos.test.mjs tests/saved.test.mjs tests/photo-picker.test.mjs tests/matches.test.mjs tests/chat.test.mjs tests/closet.test.mjs"
+    "test": "node --test tests/api.test.mjs tests/session.test.mjs tests/publish.test.mjs tests/trade-actions.test.mjs tests/auth.test.mjs tests/photos.test.mjs tests/saved.test.mjs tests/photo-picker.test.mjs tests/matches.test.mjs tests/chat.test.mjs tests/closet.test.mjs tests/chat-component.test.mjs"
   },
   "dependencies": {
     "lucide-react": "^0.468.0",
