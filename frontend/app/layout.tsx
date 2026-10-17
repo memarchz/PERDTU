@@ -1,4 +1,5 @@
 import './globals.css';
+import './motion.css';
 import { SavedItemsProvider } from '../components/saved-items-provider';
 import { AuthProvider } from '../components/auth-provider';
 export const metadata={title:'PERDTU — Open. Swap. Repeat.',description:'Discover better exchanges with PERDTU.'};

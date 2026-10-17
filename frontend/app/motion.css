@@ -1,0 +1,240 @@
+/* Gentle, finite entrance motion; controls stay usable throughout. */
+:root {
+  --ease-soft: cubic-bezier(.22, 1, .36, 1);
+  --ease-touch: cubic-bezier(.2, .8, .2, 1);
+}
+
+.button,
+.icon-button,
+.category-chip,
+.nav-link,
+.gallery-thumbnails button,
+.photo-tile button {
+  transition: background-color 180ms ease, border-color 180ms ease,
+    color 180ms ease, box-shadow 220ms ease, transform 220ms var(--ease-touch);
+}
+
+.button > svg,
+.nav-link > svg,
+.topbar-action > svg {
+  transition: transform 240ms var(--ease-soft), fill 180ms ease;
+}
+
+.button:active:not(:disabled),
+.icon-button:active:not(:disabled),
+.category-chip:active:not(:disabled),
+.gallery-thumbnails button:active:not(:disabled),
+.photo-tile button:active:not(:disabled) {
+  transform: translateY(1px) scale(.975);
+}
+
+.form-field input,
+.form-field textarea,
+.form-field select,
+.browse-search {
+  transition: border-color 180ms ease, background-color 180ms ease,
+    box-shadow 220ms ease;
+}
+
+.form-field input:focus,
+.form-field textarea:focus,
+.form-field select:focus {
+  box-shadow: 0 0 0 4px #0d5f4d0b;
+}
+
+.item-card,
+.match-card,
+.step-card,
+.trade-card {
+  transition: transform 280ms var(--ease-soft), box-shadow 280ms ease,
+    border-color 220ms ease;
+}
+
+.item-image > img {
+  transition: transform 550ms var(--ease-soft);
+}
+
+.item-card:focus-within {
+  border-color: #91ad95;
+  box-shadow: 0 0 0 3px #0d5f4d10;
+}
+
+/* Touch devices should not retain a desktop hover pose after a tap. */
+@media (hover: none) {
+  .item-card:hover,
+  .item-card:hover .item-image > img {
+    transform: none;
+    box-shadow: none;
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .item-card:hover,
+  .step-card:hover {
+    transform: translateY(-5px);
+    border-color: #c4d2c0;
+    box-shadow: 0 14px 30px #19332e0c;
+  }
+
+  .match-card:hover,
+  .trade-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 26px #19332e09;
+  }
+
+  .item-card:hover .item-image > img {
+    transform: scale(1.045);
+  }
+
+  .button:hover:not(:disabled) > .lucide-arrow-right,
+  .topbar-action:hover > svg {
+    transform: translateX(3px);
+  }
+
+  .nav-link:hover > svg {
+    transform: translateX(2px);
+  }
+
+  .category-chip:hover:not(.active) {
+    background: #edf2e7;
+    border-color: #b9cbb5;
+    transform: translateY(-1px);
+  }
+
+  .gallery-thumbnails button:hover {
+    transform: translateY(-2px);
+  }
+}
+
+@keyframes perdtu-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes perdtu-rise-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes perdtu-heart-pop {
+  0%, 100% { transform: scale(1); }
+  45% { transform: scale(1.24); }
+  75% { transform: scale(.94); }
+}
+
+@keyframes perdtu-gentle-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* No exit delay or full-page transform: fixed navigation stays fixed. */
+  .app-content,
+  .auth-form {
+    animation: perdtu-fade-in 280ms ease backwards;
+  }
+
+  .page-heading,
+  .hero-copy,
+  .hero-visual,
+  .detail-copy {
+    animation: perdtu-rise-in 420ms var(--ease-soft) backwards;
+  }
+
+  .hero-visual { animation-delay: 70ms; }
+
+  .hero-float {
+    animation: perdtu-gentle-float 4s ease-in-out 500ms 3;
+  }
+
+  .items-grid > *,
+  .matches-grid > *,
+  .steps-grid > *,
+  .trade-list > * {
+    animation: perdtu-rise-in 360ms var(--ease-soft) backwards;
+  }
+
+  :is(.items-grid, .matches-grid, .steps-grid, .trade-list) > :nth-child(2) {
+    animation-delay: 35ms;
+  }
+
+  :is(.items-grid, .matches-grid, .steps-grid, .trade-list) > :nth-child(3) {
+    animation-delay: 65ms;
+  }
+
+  :is(.items-grid, .matches-grid, .steps-grid, .trade-list) > :nth-child(n + 4) {
+    animation-delay: 90ms;
+  }
+
+  .state-panel,
+  .alert,
+  .notice,
+  .photo-tile,
+  .timeline li {
+    animation: perdtu-rise-in 260ms var(--ease-soft) backwards;
+  }
+
+  /* aria-pressed changes only when the saved state is confirmed. */
+  .save-control button[aria-pressed="true"] > .lucide-heart {
+    animation: perdtu-heart-pop 380ms var(--ease-soft);
+  }
+
+  .nav-scrim {
+    animation: perdtu-fade-in 200ms ease backwards;
+  }
+}
+
+@media (max-width: 700px) and (prefers-reduced-motion: no-preference) {
+  .sidebar {
+    transition: transform 300ms var(--ease-soft);
+  }
+}
+
+.nav-link { perspective: 500px; }
+.nav-link-label {
+  display: inline-block;
+  transform-origin: left center;
+  transition: transform 240ms var(--ease-soft), text-shadow 240ms var(--ease-soft), color 180ms ease;
+}
+.nav-link:focus-visible .nav-link-label {
+  transform: translate3d(5px, -2px, 12px) rotateX(7deg);
+  text-shadow: 0 1px 0 #d1dfd4, 0 2px 0 #bed1c3, 0 5px 8px rgb(18 75 57 / 20%);
+}
+@media (hover: hover) and (pointer: fine) {
+  .nav-link:hover .nav-link-label {
+    transform: translate3d(5px, -2px, 12px) rotateX(7deg);
+    text-shadow: 0 1px 0 #d1dfd4, 0 2px 0 #bed1c3, 0 5px 8px rgb(18 75 57 / 20%);
+  }
+}
+
+/* Includes existing smooth scroll, hover movement and loading spinners. */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto !important; }
+
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .button:active,
+  .icon-button:active,
+  .category-chip:active,
+  .item-card:hover,
+  .match-card:hover,
+  .step-card:hover,
+  .trade-card:hover,
+  .item-card:hover .item-image > img,
+  .gallery-thumbnails button:hover,
+  .gallery-thumbnails button:active,
+  .photo-tile button:active,
+  .button:hover > .lucide-arrow-right,
+  .nav-link:hover > svg,
+  .topbar-action:hover > svg,
+  .category-chip:hover {
+    transform: none !important;
+  }
+  .nav-link:is(:hover, :focus-visible) .nav-link-label {
+    transform: none !important;
+    text-shadow: none;
+  }
+}
