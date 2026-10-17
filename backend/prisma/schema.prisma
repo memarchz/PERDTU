@@ -43,6 +43,7 @@ model User {
   participations TradeParticipant[]
   photos Photo[]
   savedItems SavedItem[]
+  messages TradeMessage[]
 }
 model Item {
   id String @id @default(uuid())
@@ -83,6 +84,19 @@ model Trade {
   participants TradeParticipant[]
   items TradeItem[]
   events TradeEvent[]
+  messages TradeMessage[]
+}
+model TradeMessage {
+  id String @id @default(uuid())
+  tradeId String
+  senderId String
+  body String
+  clientMessageId String
+  createdAt DateTime @default(now())
+  trade Trade @relation(fields:[tradeId],references:[id])
+  sender User @relation(fields:[senderId],references:[id])
+  @@unique([tradeId,senderId,clientMessageId])
+  @@index([tradeId,createdAt,id])
 }
 model TradeParticipant {
   id String @id @default(uuid())

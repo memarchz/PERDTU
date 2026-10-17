@@ -9,13 +9,14 @@
     "db:migrate": "prisma migrate dev",
     "smoke": "node scripts/smoke.mjs",
     "smoke:exchange": "node scripts/exchange-smoke.mjs",
-    "test": "npm run build && node --test scripts/matching.test.mjs scripts/media-store.test.mjs scripts/trade-proposal.test.mjs scripts/intent.test.mjs scripts/embedding.test.mjs scripts/graph.test.mjs scripts/match-http.test.mjs",
+    "test": "npm run build && node --test scripts/matching.test.mjs scripts/media-store.test.mjs scripts/trade-proposal.test.mjs scripts/intent.test.mjs scripts/embedding.test.mjs scripts/graph.test.mjs scripts/match-http.test.mjs scripts/chat.test.mjs",
     "smoke:media": "node scripts/media-smoke.mjs",
     "smoke:proposal-race": "node scripts/proposal-race-smoke.mjs",
     "ai:setup": "npm run build && node scripts/setup-matching-model.mjs",
     "ai:evaluate": "node scripts/evaluate-matching-ai.mjs",
     "smoke:ai": "node scripts/ai-matching-smoke.mjs",
-    "db:deploy": "prisma migrate deploy"
+    "db:deploy": "prisma migrate deploy",
+    "smoke:chat": "node scripts/chat-smoke.mjs"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "3.1152.0",

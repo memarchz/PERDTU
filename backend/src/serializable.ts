@@ -1,9 +1,9 @@
 import { Prisma, PrismaClient } from '@prisma/client';
 
-export async function runSerializable<T>(db: PrismaClient, operation: (tx: Prisma.TransactionClient) => Promise<T>): Promise<T> {
+export async function runSerializable<T>(db: PrismaClient, operation: (tx: Prisma.TransactionClient) => Promise<T>, options: {maxWait?:number,timeout?:number} = {}): Promise<T> {
   for (let attempt = 0; ; attempt++) {
     try {
-      return await db.$transaction(operation, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable });
+      return await db.$transaction(operation, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable, ...options });
     } catch (error) {
       if (!(error instanceof Prisma.PrismaClientKnownRequestError) || error.code !== 'P2034' || attempt >= 2) throw error;
     }

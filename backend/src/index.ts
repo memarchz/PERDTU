@@ -4,6 +4,8 @@ import { createMediaRouter } from './media-routes';
 import { MediaError } from './media-store';
 import { createListingRouter } from './listing-routes';
 import { createSavedRouter } from './saved-routes';
+import { createChatRouter } from './chat-routes';
+import { ChatError } from './trade-chat';
 import {createProposal} from './trade-proposal';
 import { listingInclude, listingDto } from './listing-data';
 import { randomUUID } from 'node:crypto';
@@ -29,6 +31,7 @@ const auth = createAuth(secret);
 app.use('/api/v1',createMediaRouter(db,auth));
 app.use('/api/v1',createListingRouter(db,auth));
 app.use('/api/v1',createSavedRouter(db,auth));
+app.use('/api/v1',createChatRouter(db,auth));
 app.get('/health',(_req,res)=>res.json({status:'ok'}));
 app.post('/api/v1/auth/register',asyncRoute(async(req,res)=>{
  const d=z.object({email:z.string().email(),password:z.string().min(10),displayName:z.string().min(2).max(80)}).parse(req.body);
@@ -102,6 +105,8 @@ app.post('/api/v1/uploads/presign',auth,asyncRoute(async(req,res)=>{
  res.json({url,key,expiresIn:300});
 }));
 app.use((err:any,_req:Request,res:Response,_next:NextFunction)=>{
+ if(err instanceof ChatError) return res.status(err.status).json({error:err.message});
+ if(err instanceof Prisma.PrismaClientKnownRequestError && ['P2034','P2028'].includes(err.code)) return res.status(409).json({error:'This conversation changed. Please retry your message.'});
  if(err instanceof MediaError) return res.status(err.status).json({error:err.message});
  if(err instanceof z.ZodError) return res.status(400).json({error:'Validation failed',details:err.flatten()});
  console.error(err); res.status(500).json({error:'Internal server error'});
