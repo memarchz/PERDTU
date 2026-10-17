@@ -34,6 +34,10 @@
 
 Sidebar ยกตัวอักษรและเพิ่มเงานูนเมื่อ hover หรือใช้คีย์บอร์ดเลือกเมนู หากเปิด Reduce motion ในระบบปฏิบัติการ เอฟเฟกต์เคลื่อนไหวจะปิดอัตโนมัติ
 
+## Deploy ด้วย Docker
+
+ดู [DEPLOYMENT.md](DEPLOYMENT.md) สำหรับชุด Docker จริงของ frontend/backend, migration job, Nginx และการใช้ RDS หรือ PostgreSQL container แยกจาก development ค่าเริ่มต้นสำหรับทดลองคือ http://localhost:8080 ใช้ config `deploy/.env.production` และ volumes ชุดใหม่ รูป/โมเดล/บัญชีจากเครื่องเดิมไม่ถูกย้ายให้อัตโนมัติ
+
 ## ปัญหาที่พบบ่อย
 
 - Dockerไม่พร้อม: เปิด Docker Desktop รอ engine แล้วรัน npm run db:up

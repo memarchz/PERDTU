@@ -1,0 +1,22 @@
+# Optional self-hosted DB. No database port is published to the host.
+services:
+  postgres:
+    image: postgres:16-bookworm
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: perdtu
+      POSTGRES_USER: perdtu
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Generate POSTGRES_PASSWORD with deploy:init -- --local-db}
+    volumes:
+      - production-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U perdtu -d perdtu"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+  migrate:
+    depends_on:
+      postgres:
+        condition: service_healthy
+volumes:
+  production-pgdata:

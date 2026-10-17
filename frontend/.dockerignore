@@ -1,0 +1,14 @@
+node_modules
+.next
+.env*
+.git
+.superpowers
+*.log
+*.tsbuildinfo
+*.pem
+*.key
+*.p12
+*.pfx
+tests
+Dockerfile
+.dockerignore

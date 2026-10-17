@@ -19,3 +19,6 @@ __pycache__
 *.key
 .aws/
 .codex/
+deploy/certs/*
+!deploy/certs/.gitkeep
+deploy/backups/

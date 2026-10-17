@@ -22,6 +22,8 @@ perdtu-starter/
 
 ดูขั้นตอนพร้อมทดสอบหลายบัญชีที่ [docs/TEAM_QUICKSTART.md](docs/TEAM_QUICKSTART.md)
 
+สำหรับ Docker / Huawei ECS ดู [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md): มี Dockerfile แยก frontend/backend, migration job, Nginx, production Compose และตัวเลือก PostgreSQL container หรือ RDS เริ่มทดลองด้วย `npm run deploy:init -- --local-db` โดยแยก config และ volumes จากระบบพัฒนา
+
 ## เริ่มใช้งานครั้งแรก
 
 เตรียม Node.js20+ และ Docker Desktop (Linux containers) แล้วเปิด terminal ในโฟลเดอร์ที่มีไฟล์นี้:
@@ -55,7 +57,7 @@ npm run dev:frontend
 - AI ไทย/อังกฤษแนะนำคู่แลกจริง2–4คน แยกคู่ตรงและตัวเลือกใกล้เคียง
 - ส่งข้อเสนอ ทุกคนตอบรับก่อนจองสินค้า และยืนยันรับของจนครบวง
 
-AI เป็นคำแนะนำ ไม่ยืนยันความสนใจแทนผู้ใช้ การค้นหามีขอบเขตและอาจพลาดคู่ที่เป็นไปได้ แชต/การแจ้งเตือนยังไม่ได้ทำ
+AI เป็นคำแนะนำ ไม่ยืนยันความสนใจแทนผู้ใช้ การค้นหามีขอบเขตและอาจพลาดคู่ที่เป็นไปได้ มีแชตกลุ่มหลังทุกคน Accept ครบแล้ว การแจ้งเตือนยังไม่ได้ทำ
 
 ## คำสั่งตรวจระบบ
 
