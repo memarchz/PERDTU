@@ -1,0 +1,21 @@
+node_modules
+.next
+.env
+.env.local
+.env.*
+!.env.example
+.superpowers/
+backend/storage/
+dist
+__pycache__
+*.pyc
+
+*.tsbuildinfo
+*.log
+
+# Generated share archives and private credentials
+*.zip
+*.pem
+*.key
+.aws/
+.codex/

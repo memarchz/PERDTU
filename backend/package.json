@@ -1,0 +1,45 @@
+{
+  "name": "perdtu-api",
+  "private": true,
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "prisma:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "smoke": "node scripts/smoke.mjs",
+    "smoke:exchange": "node scripts/exchange-smoke.mjs",
+    "test": "npm run build && node --test scripts/matching.test.mjs scripts/media-store.test.mjs scripts/trade-proposal.test.mjs scripts/intent.test.mjs scripts/embedding.test.mjs scripts/graph.test.mjs scripts/match-http.test.mjs",
+    "smoke:media": "node scripts/media-smoke.mjs",
+    "smoke:proposal-race": "node scripts/proposal-race-smoke.mjs",
+    "ai:setup": "npm run build && node scripts/setup-matching-model.mjs",
+    "ai:evaluate": "node scripts/evaluate-matching-ai.mjs",
+    "smoke:ai": "node scripts/ai-matching-smoke.mjs",
+    "db:deploy": "prisma migrate deploy"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "3.1152.0",
+    "@aws-sdk/s3-request-presigner": "3.1152.0",
+    "@huggingface/transformers": "4.3.1",
+    "@prisma/client": "^5.22.0",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "2.4.0",
+    "sharp": "0.35.5",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/jsonwebtoken": "^9.0.7",
+    "@types/multer": "2.3.0",
+    "@types/node": "^22.10.0",
+    "prisma": "^5.22.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}

@@ -1,0 +1,2 @@
+﻿export async function publishListing({item,createdItemId,onItemCreated},request){if(createdItemId)return {itemId:createdItemId};const created=await request('/items',{method:'POST',body:item});onItemCreated?.(created.id);return {itemId:created.id};}
+export function recoverPublishDraft(storage,key){const draft=JSON.parse(storage.getItem(key)||'null');if(draft&&typeof draft.itemId==='string'&&draft.itemId)storage.removeItem(key);return draft;}

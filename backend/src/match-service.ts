@@ -1,0 +1,27 @@
+﻿import {GraphService} from './graph-service';
+import {PrismaClient} from '@prisma/client';
+import {EmbeddingService,EmbeddingInput} from './embedding-service';
+import {embeddingText,itemFingerprint,hasIntent} from './exchange-intent';
+import {evaluateCycle,findItemCycles,ExchangeItem,Policy,Evaluation} from './matching';
+import {matchingPolicy} from './match-policy';import {listingInclude,listingDto} from './listing-data';
+import {MODEL,MODEL_KEY} from './ai-model';import {MediaError} from './media-store';
+export type Prepared={fingerprints:Record<string,string>;vectors:Map<string,number[]>;policy:Policy};
+export function inputsFor(items:ExchangeItem[]):EmbeddingInput[]{if(!items.some(i=>i.exchangeWanted))return [];return items.flatMap(item=>[{role:'offer' as const,text:embeddingText(item,'offer')},...(item.exchangeWanted?[{role:'wanted' as const,text:embeddingText(item,'wanted')}]:[])]);}
+export class MatchService {
+ readonly embeddings:EmbeddingService;readonly graph=new GraphService();private jobs=new Map<string,{started:number;state:'preparing'|'ready'|'unavailable';vectors?:Map<string,number[]>;graphs?:Map<string,Promise<Evaluation[]>>}>();
+ constructor(private db:PrismaClient,embeddings?:EmbeddingService){this.embeddings=embeddings||new EmbeddingService(db);}
+ async prepareEvaluation(edges:{from:string;to:string;itemId:string}[],userId:string):Promise<Prepared>{const items=await this.db.item.findMany({where:{id:{in:edges.map(e=>e.itemId)}}});if(items.length!==edges.length||!items.some(i=>i.ownerId===userId))throw new MediaError('Some items are unavailable',409);let vectors:Map<string,number[]>;try{vectors=await this.embeddings.prepare(inputsFor(items));}catch{throw new MediaError('Local AI is unavailable or busy. Please retry.',503);}const policy=matchingPolicy();if(!evaluateCycle(items,edges,userId,vectors,policy))throw new MediaError('This exchange does not match the current listing preferences.',400);return {fingerprints:Object.fromEntries(items.map(i=>[i.id,itemFingerprint(i)])),vectors,policy};}
+ async suggestions(userId:string,options:{itemId?:string;targetItemId?:string;mode:'direct'|'circles';includeAlternatives:boolean}){
+ const owned=await this.db.item.findMany({where:{ownerId:userId,status:'AVAILABLE'},include:listingInclude,orderBy:[{createdAt:'desc'},{id:'asc'}]});const anchor=options.itemId?owned.find(i=>i.id===options.itemId):owned.find(hasIntent);
+ const base={selectedItemId:anchor?.id||null,model:{...MODEL,modelKey:MODEL_KEY,scoringVersion:matchingPolicy().version},matches:[],candidatesConsidered:0,truncated:false};
+ if(options.itemId&&!anchor)throw new MediaError('Item not found',404);if(!anchor||!hasIntent(anchor))return {status:'ready',...base,message:'Add exchange preferences to an available item in your closet.'};
+ const target=options.targetItemId?await this.db.item.findFirst({where:{id:options.targetItemId,status:'AVAILABLE',ownerId:{not:userId}},include:listingInclude}):null;if(options.targetItemId&&!target)throw new MediaError('Item not found',404);
+ const pool=options.mode==='direct'&&target?[target]:await this.db.item.findMany({where:{status:'AVAILABLE',ownerId:{not:userId},OR:[{exchangeWanted:{not:null}},{exchangeCategory:{not:null}}]},include:listingInclude,orderBy:[{createdAt:'desc'},{id:'asc'}],take:501});
+ const items=[anchor,...pool.slice(0,500)];if(target&&!items.some(i=>i.id===target.id))items[items.length>=501?items.length-1:items.length]=target;
+ const meta={...base,candidatesConsidered:items.length,truncated:pool.length>500||options.mode==='circles'};
+ const key=MODEL_KEY+matchingPolicy().version+items.map(itemFingerprint).join(':');const now=Date.now();for(const [k,j]of this.jobs)if(now-j.started>60000&&j.state!=='preparing')this.jobs.delete(k);
+ let job=this.jobs.get(key);if(!job){if(this.jobs.size>=16){const old=[...this.jobs].find(([,j])=>j.state!=='preparing');if(old)this.jobs.delete(old[0]);}if([...this.jobs.values()].filter(j=>j.state==='preparing').length>=2)return {status:'unavailable',...meta,message:'Local AI is busy. Please retry shortly.'};job={started:now,state:'preparing'};this.jobs.set(key,job);const current=job;void this.embeddings.prepare(inputsFor(items)).then(vectors=>{current.vectors=vectors;current.state='ready';}).catch(()=>{current.state='unavailable';});}
+ if(job.state==='unavailable'){this.jobs.delete(key);return {status:'unavailable',...meta,message:'Local AI is unavailable. Please retry or check model setup on the server.'};}if(job.state==='preparing')return {status:'preparing',...meta,message:'Preparing local AI suggestions…'};
+ const policy=matchingPolicy();const graphKey=JSON.stringify(options);job.graphs||=new Map();let graph=job.graphs.get(graphKey);if(!graph){graph=this.graph.find(items,anchor.id,{...options,limit:30},job.vectors!,policy);if(job.graphs.size>=8)job.graphs.delete(job.graphs.keys().next().value!);job.graphs.set(graphKey,graph);}let evaluated;try{evaluated=await graph;}catch{job.graphs.delete(graphKey);throw new MediaError('Circle search is busy or unavailable. Please retry.',503);}const matches=evaluated.map(c=>({...c,fingerprints:Object.fromEntries(c.edges.map(e=>{const item=items.find(i=>i.id===e.itemId)!;return [item.id,itemFingerprint(item)];})),items:c.edges.map(e=>listingDto(items.find(i=>i.id===e.itemId)!)),participants:c.edges.map(e=>items.find(i=>i.id===e.itemId)!.owner)}));return {status:'ready',...meta,matches};
+ }
+}

@@ -1,0 +1,17 @@
+{
+  "name": "perdtu",
+  "private": true,
+  "scripts": {
+    "setup": "node scripts/setup.mjs",
+    "dev:frontend": "npm --prefix frontend run dev",
+    "dev:backend": "npm --prefix backend run dev",
+    "build:frontend": "npm --prefix frontend run build",
+    "build:backend": "npm --prefix backend run build",
+    "test:frontend": "npm --prefix frontend test",
+    "test:backend": "npm --prefix backend test",
+    "db:up": "docker compose up -d postgres",
+    "db:migrate": "npm --prefix backend run db:deploy",
+    "ai:setup": "npm --prefix backend run ai:setup",
+    "ai:evaluate": "npm --prefix backend run ai:evaluate"
+  }
+}

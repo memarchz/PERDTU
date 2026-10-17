@@ -1,0 +1,155 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ItemStatus {
+  DRAFT
+  AVAILABLE
+  RESERVED
+  EXCHANGED
+  ARCHIVED
+}
+
+enum TradeStatus {
+  PROPOSED
+  CONFIRMED
+  EXCHANGING
+  COMPLETED
+  DECLINED
+  EXPIRED
+  CANCELLED
+  DISPUTED
+}
+
+enum Decision {
+  PENDING
+  ACCEPTED
+  DECLINED
+}
+model User {
+  id String @id @default(uuid())
+  email String @unique
+  passwordHash String
+  displayName String
+  role String @default("USER")
+  createdAt DateTime @default(now())
+  items Item[]
+  wishes Wish[]
+  participations TradeParticipant[]
+  photos Photo[]
+  savedItems SavedItem[]
+}
+model Item {
+  id String @id @default(uuid())
+  ownerId String
+  owner User @relation(fields:[ownerId],references:[id])
+  title String
+  description String
+  category String
+  condition String
+  imageUrl String?
+  area String @default("Campus")
+  status ItemStatus @default(AVAILABLE)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  exchangeWanted String?
+  exchangeCategory String?
+  exchangeOpenToAlternatives Boolean @default(false)
+  tradeItems TradeItem[]
+  photos Photo[]
+  savedBy SavedItem[]
+  @@index([status,category,createdAt])
+  @@index([ownerId,status])
+}
+model Wish {
+  id String @id @default(uuid())
+  userId String
+  user User @relation(fields:[userId],references:[id])
+  description String
+  category String?
+  createdAt DateTime @default(now())
+  @@index([userId])
+}
+model Trade {
+  id String @id @default(uuid())
+  status TradeStatus @default(PROPOSED)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  participants TradeParticipant[]
+  items TradeItem[]
+  events TradeEvent[]
+}
+model TradeParticipant {
+  id String @id @default(uuid())
+  tradeId String
+  userId String
+  trade Trade @relation(fields:[tradeId],references:[id])
+  user User @relation(fields:[userId],references:[id])
+  decision Decision @default(PENDING)
+  ready Boolean @default(false)
+  received Boolean @default(false)
+  @@unique([tradeId,userId])
+}
+model TradeItem {
+  id String @id @default(uuid())
+  tradeId String
+  itemId String
+  fromUserId String
+  toUserId String
+  snapshot Json
+  trade Trade @relation(fields:[tradeId],references:[id])
+  item Item @relation(fields:[itemId],references:[id])
+  @@unique([tradeId,itemId])
+}
+model TradeEvent {
+  id String @id @default(uuid())
+  tradeId String
+  actorId String
+  eventType String
+  createdAt DateTime @default(now())
+  trade Trade @relation(fields:[tradeId],references:[id])
+  @@index([tradeId,createdAt])
+}
+
+model Photo {
+  id String @id @default(uuid())
+  ownerId String
+  owner User @relation(fields:[ownerId],references:[id])
+  itemId String?
+  item Item? @relation(fields:[itemId],references:[id])
+  filename String @unique
+  mime String
+  bytes Int
+  width Int
+  height Int
+  position Int?
+  createdAt DateTime @default(now())
+  @@index([ownerId,itemId])
+  @@unique([itemId,position])
+}
+
+model SavedItem {
+  id String @id @default(uuid())
+  userId String
+  user User @relation(fields:[userId],references:[id])
+  itemId String
+  item Item @relation(fields:[itemId],references:[id])
+  createdAt DateTime @default(now())
+  @@unique([userId,itemId])
+  @@index([userId,createdAt])
+}
+
+model EmbeddingCache {
+ key String @id
+ modelKey String
+ role String
+ contentHash String
+ vector Json
+ createdAt DateTime @default(now())
+ @@unique([modelKey,role,contentHash])
+}

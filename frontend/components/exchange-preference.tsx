@@ -1,0 +1,2 @@
+import type {ItemSummary} from '../lib/types';
+export function ExchangePreference({item}:{item:ItemSummary}){return <div className="exchange-preference"><strong>Wants to exchange for</strong><p>{item.exchangeWanted||item.exchangeCategory||'Exchange preference not provided'}</p>{item.exchangeWanted&&item.exchangeCategory&&<small>Preferred category: {item.exchangeCategory}</small>}{item.exchangeOpenToAlternatives&&<small>Open to similar alternatives</small>}</div>;}

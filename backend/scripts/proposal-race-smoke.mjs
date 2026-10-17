@@ -1,0 +1,11 @@
+﻿import 'dotenv/config';
+import assert from 'node:assert/strict';
+import {randomUUID} from 'node:crypto';
+import {PrismaClient} from '@prisma/client';
+import {MatchService} from '../dist/match-service.js';
+import {createProposal} from '../dist/trade-proposal.js';
+const base='http://localhost:4000',db=new PrismaClient();
+async function api(path,body,token,method='POST',status=200){const r=await fetch(base+'/api/v1'+path,{method,headers:{'Content-Type':'application/json',...(token?{Authorization:'Bearer '+token}:{})},body:body?JSON.stringify(body):undefined});assert.equal(r.status,status);return r.status===204?null:r.json();}
+try{for(const verb of ['PATCH','DELETE']){const users=[],items=[],markers=[randomUUID(),randomUUID()];for(let i=0;i<2;i++){const body={email:`proposal-race-${randomUUID()}@example.test`,password:randomUUID(),displayName:'Proposal race verification'};await api('/auth/register',body,null,'POST',201);users.push(await api('/auth/login',body));items.push(await api('/items',{title:'Proposal '+markers[i],description:'Race fixture '+markers[i],category:'Books',exchangeCategory:'Books',condition:'GOOD'},users[i].accessToken,'POST',201));}const edges=items.map((item,i)=>({from:users[i].user.id,to:users[(i+1)%2].user.id,itemId:item.id}));let release,notify,first=true;const read=new Promise(r=>notify=r),gate=new Promise(r=>release=r);const wrapped={$transaction:(fn,options)=>db.$transaction(async tx=>fn(new Proxy(tx,{get(target,key){if(key!=='item')return target[key];return new Proxy(tx.item,{get(model,method){if(method!=='findMany')return model[method];return async args=>{const rows=await tx.item.findMany(args);if(first){first=false;notify();await gate;}return rows;};}});}})),options)};
+const prepared=await new MatchService(db).prepareEvaluation(edges,users[0].user.id,edges);const pending=createProposal(wrapped,users[0].user.id,edges,prepared).then(trade=>({trade}),error=>({error}));await read;
+await api('/items/'+items[0].id,verb==='PATCH'?{title:'Current title after edit'}:undefined,users[0].accessToken,verb,verb==='PATCH'?200:204);release();const result=await pending;assert.equal(result.error?.status,409);console.log('PASS deterministic proposal read → '+verb+' commit → proposal insert/retry');}}finally{await db.$disconnect();}
