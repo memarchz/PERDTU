@@ -190,7 +190,43 @@
   }
 }
 
-.nav-link { perspective: 500px; }
+/* Scroll the whole navigation on short screens, without shrinking its links. */
+.sidebar {
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior-y: contain;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  scrollbar-color: #b6c8b8 #f5f6ef;
+}
+.sidebar > * { flex-shrink: 0; }
+.sidebar::-webkit-scrollbar { width: 6px; }
+.sidebar::-webkit-scrollbar-track { background: #f5f6ef; }
+.sidebar::-webkit-scrollbar-thumb { background: #b6c8b8; border-radius: 10px; }
+.sidebar nav { padding: 6px 8px 10px 0; }
+
+/* Lift the entire menu tile; the shadow forms a visible raised base. */
+.sidebar .nav-link {
+  position: relative;
+  perspective: 500px;
+  border: 1px solid transparent;
+  transform-origin: left center;
+  transition: transform 280ms var(--ease-soft), box-shadow 280ms var(--ease-soft),
+    background-color 220ms ease, border-color 220ms ease, color 220ms ease;
+}
+.sidebar .nav-link:is(:hover, :focus-visible) {
+  transform: translate3d(5px, -5px, 0) scale(1.025);
+  background: #eaf3e7;
+  color: #0d5f4d;
+  border-color: #c2d5bd;
+  box-shadow: 0 5px 0 #bbceba, 0 12px 20px rgb(25 70 45 / 19%);
+  z-index: 1;
+}
+.sidebar .nav-link:focus-visible { outline: 2px solid #0d5f4d; outline-offset: 3px; }
+.sidebar .nav-link:active {
+  transform: translate3d(3px, -1px, 0) scale(1.01);
+  box-shadow: 0 2px 0 #bbceba, 0 5px 10px rgb(25 70 45 / 13%);
+}
 .nav-link-label {
   display: inline-block;
   transform-origin: left center;
@@ -236,5 +272,8 @@
   .nav-link:is(:hover, :focus-visible) .nav-link-label {
     transform: none !important;
     text-shadow: none;
+  }
+  .sidebar .nav-link:is(:hover, :focus-visible, :active) {
+    transform: none !important;
   }
 }
